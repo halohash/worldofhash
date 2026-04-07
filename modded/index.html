@@ -3,11 +3,11 @@
 	<head>
 		<title>Our World of Text</title>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-		<link rel="shortcut icon" type="image/png" href="./static/favicon.png">
+		<link rel="shortcut icon" type="image/png" href="https://halohash.github.io/worldofhash/static/favicon.png">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 		<meta name="description" content="Infinitely large website. Write anywhere.">
-		<meta property="og:image" content="./static/logo.png">
-		<link type="text/css" rel="stylesheet" href="./static/css/yourworld.css">
+		<meta property="og:image" content="https://halohash.github.io/worldofhash/static/logo.png">
+		<link type="text/css" rel="stylesheet" href="https://halohash.github.io/worldofhash/static/css/yourworld.css">
 		
 	</head>
 	<body>
@@ -21,7 +21,7 @@
 			<div id="topbar_inner">
 				<div id="announce_container"></div>
 				<span id="menu" class="ui-vis tab menu" style="display: none;">
-					<img src="./static/pin.svg" class="menuPin" style="display: none;">
+					<img src="https://halohash.github.io/worldofhash/static/pin.svg" class="menuPin" style="display: none;">
 					<span class="menuText">Menu</span>
 					<span style="font-size:50%">▼</span>
 				</span>
@@ -136,14 +136,106 @@
 			</div>
 		</div>
 
-		<script src="./static/yw/javascript/helpers.js"></script>
-		<script src="./static/lib/jscolor.min.js"></script>
-		<script src="./static/yw/javascript/modals.js"></script>
-		<script src="./static/yw/javascript/menu.js"></script>
-		<script src="./static/yw/javascript/permissions.js"></script>
-		<script src="./static/yw/javascript/chat.js"></script>
-		<script src="./static/yw/javascript/renderer.js"></script>
-		<script src="./static/yw/javascript/owot.js"></script>
-		<script src="https://gamate-hash.github.io/pizda.user.js" defer></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/helpers.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/lib/jscolor.min.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/modals.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/menu.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/permissions.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/chat.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/renderer.js"></script>
+		<script src="https://halohash.github.io/worldofhash/static/yw/javascript/owot.js"></script>
+		<!-- <script src="https://gamate-hash.github.io/pizda.user.js" defer></script>-->
+<script defer>
+	
+	/*
+	Export part of a world as HTML
+	12/21/2022
+	Instructions:
+	Press Alt+D or Ctrl+X and select part of a world. A file will be saved once you let go of your mouse.
+*/
+
+var reg = new RegionSelection();
+reg.init();
+
+reg.onselection(function(start, end, width, height) {
+	var tx = start[0];
+	var ty = start[1];
+	var cx = start[2];
+	var cy = start[3];
+	var name = state.worldModel.name;
+	var res = "";
+	res += "<html>";
+	res += "<head>";
+	res += "<title>World - \"" + encodeURIComponent(name) + "\"</title>";
+	res += "<style>";
+	res += "";
+	res += "</style>";
+	res += "</head>";
+	res += "<body>";
+	res += "<pre style=\"font-family: 'Courier New'; font-size: 16px;\">";
+	var prevColor = 0;
+	for(var y = 0; y < height; y++) {
+		var line = "";
+		for(var x = 0; x < width; x++) {
+			var ci = getCharInfo(tx, ty, cx, cy);
+			
+			var char = html_tag_esc(ci.char);
+			char = char.replace(/\t/g, " ");
+			char = char.replace(/\r/g, " ");
+			char = char.replace(/\n/g, " ");
+			var color = ci.color;
+			
+			if(prevColor == color) {
+				res += char;
+			} else {
+				if(prevColor > 0) {
+					res += "</span>";
+				}
+				if(color > 0) {
+					res += "<span style=\"color:#" + (color.toString(16).padStart(6, 0)) + "\">";
+				}
+				res += char;
+			}
+			
+			prevColor = color;
+			
+			cx++;
+			if(cx >= 16) {
+				cx = 0;
+				tx++;
+			}
+		}
+		cy++;
+		if(cy >= 8) {
+			ty++;
+			cy = 0;
+		}
+		cx = start[2];
+		tx = start[0];
+		if(prevColor > 0) {
+			res += "</span>";
+		}
+		prevColor = 0;
+		res += "<br>";
+	}
+	res += "</pre>";
+	res += "</body>";
+	res += "</html>";
+	
+	var save = document.createElement("a");
+	var blob = new Blob([res], {type: "text/html"});
+	var url = window.URL.createObjectURL(blob);
+	save.href = url;
+	save.download = "export-" + Date.now() + ".html";
+	save.click();
+	window.URL.revokeObjectURL(blob);
+});
+w.on("keydown", function(e) {
+	if(checkKeyPress(e, ["ALT+M", "CTRL+M"])) {
+		e.preventDefault();
+		reg.startSelection();
+	}
+});
+</script>
 	</body>
 </html>
