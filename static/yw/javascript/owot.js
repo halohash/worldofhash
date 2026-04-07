@@ -4160,7 +4160,7 @@ function createWsPath() {
 	var search = window.location.search;
 	if(!search) search = "";
 	if (search === "?ywot") {
-		return "ws" + (window.location.protocol == "https:" ? "s" : "") + "://yourworldoftext.com/ws/";
+		return "ws" + (window.location.protocol == "https:" ? "s" : "") + "://www.yourworldoftext.com/ws/";
 	}
 	return "ws" + (window.location.protocol == "https:" ? "s" : "") + "://ourworldoftext.com/ws/";
 }
