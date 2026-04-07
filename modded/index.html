@@ -242,6 +242,95 @@ console.log('type startGuy() to start, stopGuy() to stop'); let startGuy=()=>ggI
 w.menu.addOption("Spawn Glasses", (function() {startGuy()}))
 w.menu.addOption("Stop Glasses", (function() {stopGuy()}))
 function createBox(size) { const horizontalLine = '+' + '-'.repeat(2 * size - 1) + '+'; const verticalLine = '|' + ' '.repeat(2 * size - 1) + '|'; let box = horizontalLine + '\n'; for (let i = 0; i < size; i++) { box += verticalLine + '\n'; } box += horizontalLine; return box; }; menu.addOption("make box",_=>{createBox(parseInt(prompt("size n number?"))).split('').forEach(e=>{writeChar(e)})});writeChar = (char, doNotMoveCursor, color, noNewline, undoCursorOffset, bgColor, dB, dI, dU, dS) => { char += ""; var charColor = color || YourWorld.Color; var charBgColor = bgColor || YourWorld.BgColor; if (color == 0) charColor = 0; if (bgColor == 0) charBgColor = 0; var cursor = cursorCoords; if (!cursor && (char == "\n" || char == "\r") && !noNewline) { cursor = cursorCoordsCurrent; } var skipChar = false; if (char == "") { skipChar = true; } else { char = w.split(char); char = char[0]; if (char == void 0) return; } if (!cursor) return; var tileX = cursor[0]; var tileY = cursor[1]; var charX = cursor[2]; var charY = cursor[3]; var newLine = (char == "\n" || char == "\r") && !noNewline; if (!doNotMoveCursor) { var pos = propagatePosition( { tileX: cursor[0], tileY: cursor[1], charX: cursor[2], charY: cursor[3] }, char, noNewline ); renderCursor([pos.tileX, pos.tileY, pos.charX, pos.charY]); if (cursorCoords) { var compare = cursor.slice(0); if ( cursorCoords[0] == compare[0] && cursorCoords[1] == compare[1] && cursorCoords[2] == compare[2] && cursorCoords[3] == compare[3] ) { return null; } } } if (!newLine && !skipChar) { var data = { char: char, color: charColor, bgColor: charBgColor, tileX: tileX, tileY: tileY, charX: charX, charY: charY, }; w.emit("writeBefore", data);if(data.char==" "||data.char=="⠀"){skipChar==true} else{writeCharTo( data.char, data.color, data.tileX, data.tileY, data.charX, data.charY, 0, undoCursorOffset, data.bgColor, dB, dI, dU, dS ); w.emit("write", data); }}}
+menu.addOption('Image Paster', async () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        await new Promise(resolve => img.onload = resolve);
+
+        const x = parseInt(prompt('Enter starting X coordinate:', 20));
+        const y = parseInt(prompt('Enter starting Y coordinate:', 15));
+
+        if (isNaN(x) || isNaN(y)) {
+            alert('Invalid coordinates!');
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const maxWidth = 300;
+        const maxHeight = 300;
+
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.floor(width * ratio);
+            height = Math.floor(height * ratio);
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const imageData = ctx.getImageData(0, 0, width, height).data;
+
+        const delay = 1;
+        let position = 0;
+
+        for (let py = 0; py < height; py += 2) {
+            for (let px = 0; px < width; px++) {
+
+                const i1 = (py * width + px) * 4;
+                const r1 = imageData[i1];
+                const g1 = imageData[i1 + 1];
+                const b1 = imageData[i1 + 2];
+                const a1 = imageData[i1 + 3];
+
+                let r2 = 0, g2 = 0, b2 = 0, a2 = 0;
+                if (py + 1 < height) {
+                    const i2 = ((py + 1) * width + px) * 4;
+                    r2 = imageData[i2];
+                    g2 = imageData[i2 + 1];
+                    b2 = imageData[i2 + 2];
+                    a2 = imageData[i2 + 3];
+                }
+
+                if (a1 < 128 && a2 < 128) continue;
+
+                const color1 = rgbToOwotColor(r1, g1, b1);
+
+                setTimeout(() => {
+                    writeCharToXY('█', color1, x + px, y + Math.floor(py / 2));
+                }, position * delay);
+
+                position++;
+            }
+        }
+
+        alert(`Image will be pasted over ${Math.ceil((position * delay)/1000)} seconds`);
+    };
+
+    fileInput.click();
+
+    function rgbToOwotColor(r, g, b) {
+        if (typeof resolveColorValue === "function") {
+            return resolveColorValue(`rgb(${r},${g},${b})`);
+        }
+        // fallback if OWOT function missing
+        return `rgb(${r},${g},${b})`;
+    }
+});
 </script>
 <script>
 	menu.addOption("Set World",
