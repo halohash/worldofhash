@@ -102,7 +102,7 @@ function api_chat_send(message, opts) {
 	if (window.Location.search !== "") {
 			message = message.trim() + "\nSent from HaloHash's WorldOfHash\nhttps://halohash.github.io/worldofhash/";
 	} else {
-	message = message.trim() + "\nSent from HaloHash's WorldOfHash\nhttps://halohash.github.io/worldofhash/";}
+	message = message.trim();}
 	if(!message.length) return;
 	message = message.slice(0, msgLim);
 	chatWriteHistory.push(message);
