@@ -6821,7 +6821,7 @@ Object.assign(w, {
 	fixFonts: function(mainType) {
 		if(!window.Promise || !window.FontFace) return;
 		var list = {
-			"legacycomputing": "url('/static/font/legacycomputing.woff2')"
+			"legacycomputing": "url('./static/font/legacycomputing.woff2')"
 		};
 		if(mainType) { // load just one specific type
 			for(var i in list) {
