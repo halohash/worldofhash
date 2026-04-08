@@ -328,26 +328,6 @@ menu.addOption('Image Paster', async () => {
 });
 </script>
 <script>
-	menu.addOption("Set World",
-    function () {
-    var newSocket = prompt("Enter World:");
-    if (!newSocket) return;
-
-    if (typeof w !== "undefined" && typeof w.changeSocket === "function") {
-        w.changeSocket("wss://ourworldoftext.com/" + newSocket + "/ws/");
-    } else {
-        alert("w.changeSocket is not available.");
-    }}
-)
-
-	menu.addOption("Back to Home",
-    function () {
-    if (typeof w !== "undefined" && typeof w.changeSocket === "function") {
-        w.changeSocket("wss://ourworldoftext.com/worldofhash/ws/");
-    } else {
-        alert("w.changeSocket is not available.");
-    }}
-)
 menu.addOption("Paint",
 (function(){	w.loadScript("https://ourworldoftext.com/static/files/paint_1699.js")})
 )
